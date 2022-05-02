@@ -3,7 +3,12 @@ package weather.ui;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.Locale;
+import java.util.Scanner;
 
+import tk.plogitech.darksky.forecast.GeoCoordinates;
+import tk.plogitech.darksky.forecast.model.Latitude;
+import tk.plogitech.darksky.forecast.model.Longitude;
 import weather.ctrl.WeatherController;
 
 public class UserInterface 
@@ -12,37 +17,39 @@ public class UserInterface
 	private WeatherController ctrl = new WeatherController();
 
 	public void getWeatherForCity1(){
-		
-		//TODO enter the coordinates 
-		ctrl.process(null);
+		Longitude longitude = new Longitude(44.3918);
+		Latitude latitude = new Latitude(33.3303);
+		GeoCoordinates location = new GeoCoordinates(longitude, latitude);
+		ctrl.process(location);
 
 	}
 
 	public void getWeatherForCity2(){
-		//TODO enter the coordinates 
-		ctrl.process(null);
-
+		GeoCoordinates location = new GeoCoordinates(new Longitude(45.3523), new Latitude(35.6023));
+		ctrl.process(location);
 	}
 
 	public void getWeatherForCity3(){
-		//TODO enter the coordinates 
-		ctrl.process(null);
-
-}
+		GeoCoordinates location = new GeoCoordinates(new Longitude(44.1871),new Latitude(36.316));
+		ctrl.process(location);
+	}
 	
 	public void getWeatherByCoordinates() {
-		//TODO read the coordinates from the cmd
-		//TODO enter the coordinates 
-		ctrl.process(null);
-		
+		Scanner scanner = new Scanner(System.in).useLocale(Locale.US);
+		System.out.print("Longitude: ");
+		Double longitude = scanner.nextDouble();
+		System.out.print("Latitude: ");
+		Double latitude = scanner.nextDouble();
+		GeoCoordinates location = new GeoCoordinates(new Longitude(longitude),new Latitude(latitude));
+		ctrl.process(location);
 	}
 
 	public void start() {
 		Menu<Runnable> menu = new Menu<>("Weather Infos");
 		menu.setTitel("Wählen Sie eine Stadt aus:");
-		menu.insert("a", "City 1", this::getWeatherForCity1);
-		menu.insert("b", "City 2", this::getWeatherForCity2);
-		menu.insert("c", "City 3", this::getWeatherForCity3);
+		menu.insert("a", "Bagdad", this::getWeatherForCity1);
+		menu.insert("b", "Sulaymaniyah", this::getWeatherForCity2);
+		menu.insert("c", "Erbil", this::getWeatherForCity3);
 		menu.insert("d", "City via Coordinates:",this::getWeatherByCoordinates);
 		menu.insert("q", "Quit", null);
 		Runnable choice;

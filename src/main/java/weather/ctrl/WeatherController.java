@@ -2,30 +2,26 @@ package weather.ctrl;
 
 
 import tk.plogitech.darksky.api.jackson.DarkSkyJacksonClient;
-import tk.plogitech.darksky.forecast.APIKey;
-import tk.plogitech.darksky.forecast.ForecastRequest;
-import tk.plogitech.darksky.forecast.ForecastRequestBuilder;
-import tk.plogitech.darksky.forecast.GeoCoordinates;
+import tk.plogitech.darksky.forecast.*;
 import tk.plogitech.darksky.forecast.model.Forecast;
 
 public class WeatherController {
     
-    private String apiKey = "Enter your API key";
+    private String apiKey = "ab5c55091bfde0864c41b337f1c66af5";
     
 
     public void process(GeoCoordinates location) {
-        System.out.println("process "+location); //$NON-NLS-1$
-		//Forecast data = getData();
-		
-		//TODO implement Error handling 
-		
-		//TODO implement methods for
-		// highest temperature 
-		// average temperature 
-		// count the daily values
-		
-		// implement a Comparator for the Windspeed 
-		
+        System.out.println("process "+location.latitude().value().toString() + " " +location.longitude().value().toString()); //$NON-NLS-1$
+		Forecast data = getData(location);
+
+		try{
+           data.getDaily().getData().stream().mapToDouble(temp-> temp.getTemperatureHigh()).max().ifPresent(maxTemp-> System.out.println("Highest temperature was: " + maxTemp));
+           data.getDaily().getData().stream().mapToDouble(temp-> temp.getTemperatureHigh()).average().ifPresent(maxTemp-> System.out.println("Average temperature was: " + maxTemp));
+           System.out.println("Daily values: " + data.getDaily().getData().stream().count());
+           System.out.println(data.getHourly().getData().stream().sorted((o1,o2)-> (int) (o1.getWindSpeed() - o2.getWindSpeed())));
+        }catch (Exception ex){
+            ex.printStackTrace();
+        }
 	}
     
     
@@ -36,8 +32,13 @@ public class WeatherController {
                 .build();
 
         DarkSkyJacksonClient client = new DarkSkyJacksonClient();
-        //Forecast forecast = client.forecast(request);
-        
+        try {
+            Forecast forecast = client.forecast(request);
+            return forecast;
+        } catch (ForecastException e) {
+            e.printStackTrace();
+        }
+
         return null;
     }
 }
