@@ -16,9 +16,9 @@ public class WeatherController {
 
 		try{
            data.getDaily().getData().stream().mapToDouble(temp-> temp.getTemperatureHigh()).max().ifPresent(maxTemp-> System.out.println("Highest temperature was: " + maxTemp));
-           data.getDaily().getData().stream().mapToDouble(temp-> temp.getTemperatureHigh()).average().ifPresent(maxTemp-> System.out.println("Average temperature was: " + maxTemp));
+           data.getDaily().getData().stream().mapToDouble(temp-> temp.getTemperatureHigh()).average().ifPresent(avgTemp-> System.out.println("Average temperature was: " + avgTemp));
+           data.getHourly().getData().stream().mapToDouble(temp-> temp.getWindSpeed()).max().ifPresent(maxWind-> System.out.println("Highest wind speed was: " + maxWind));
            System.out.println("Daily values: " + data.getDaily().getData().stream().count());
-           System.out.println(data.getHourly().getData().stream().sorted((o1,o2)-> (int) (o1.getWindSpeed() - o2.getWindSpeed())));
         }catch (Exception ex){
             ex.printStackTrace();
         }
