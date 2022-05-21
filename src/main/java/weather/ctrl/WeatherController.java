@@ -10,31 +10,34 @@ import java.util.List;
 
 public class WeatherController {
     
-    private String apiKey = "ab5c55091bfde0864c41b337f1c66af5";
-    
+    public static String apiKey = "ab5c55091bfde0864c41b337f1c66af5";
 
-    public void process(GeoCoordinates location) throws MyExecption {
-        //ToDo: Liste an GeoCoordinates
-        System.out.println("process "+location.latitude().value().toString() + " " +location.longitude().value().toString()); //$NON-NLS-1$
-		Forecast data = getData(location);
-        List<String> listOfCity = new ArrayList<>();
-		try{
-            Double highestTemp = getHighestTemp(data);
-            Double averageTemp = getAverageTemp(data);
-            Double highestWind = getHighestWind(data);
 
-            listOfCity.add("Highest temp "+highestTemp);
-            listOfCity.add("Average temp "+averageTemp);
-            listOfCity.add("Highest wind "+highestWind);
+    public void process(List<GeoCoordinates> location) throws MyExecption {
+        List<Forecast> data = getData(location);
+        List<GeoCoordinates> listOfCity = new ArrayList<>();
+        try{
+            for (var item : data) {
+                Double highestTemp = getHighestTemp(item);
+                Double averageTemp = getAverageTemp(item);
+                Double highestWind = getHighestWind(item);
+            }
+
+            for (var item : location) {
+                listOfCity.add(item);
+            }
 
             SequentialDownloader sequentialDownloader = new SequentialDownloader();
             sequentialDownloader.process(listOfCity);
 
-            System.out.println("Daily values: " + data.getDaily().getData().stream().count());
-        }catch (Exception ex){
-            throw new MyExecption(ex.getMessage());
+            ParallelDownloader parallelDownloader = new ParallelDownloader();
+            parallelDownloader.process(listOfCity);
+
+//            System.out.println("Daily values: " + data.getDaily().getData().stream().count());
+        }catch (Exception e){
+            throw new MyExecption();
         }
-	}
+    }
 
     private double  getHighestTemp(Forecast data) {
         return data.getDaily().getData().stream().mapToDouble(temp-> temp.getTemperatureHigh()).max().getAsDouble();
@@ -49,20 +52,26 @@ public class WeatherController {
     }
 
 
-    public Forecast getData(GeoCoordinates location) {
-		ForecastRequest request = new ForecastRequestBuilder()
-                .key(new APIKey(apiKey))
-                .location(location)
-                .build();
 
-        DarkSkyJacksonClient client = new DarkSkyJacksonClient();
-        try {
-            Forecast forecast = client.forecast(request);
-            return forecast;
-        } catch (ForecastException e) {
-            e.printStackTrace();
+
+    public List<Forecast> getData(List<GeoCoordinates> location) throws MyExecption {
+        List<Forecast> forecasts = new ArrayList<>();
+        for (var city : location) {
+            ForecastRequest request = new ForecastRequestBuilder()
+                    .key(new APIKey(apiKey))
+                    .location(city)
+                    .build();
+
+            DarkSkyJacksonClient client = new DarkSkyJacksonClient();
+
+            try {
+                Forecast forecast = client.forecast(request);
+                forecasts.add(forecast);
+                return forecasts;
+            } catch (ForecastException e) {
+                throw new MyExecption();
+            }
         }
-
         return null;
     }
 }

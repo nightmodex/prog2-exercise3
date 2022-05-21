@@ -3,6 +3,8 @@ package weather.ui;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 import java.util.Scanner;
 
@@ -16,13 +18,15 @@ public class UserInterface
 {
 
 	private WeatherController ctrl = new WeatherController();
+	List<GeoCoordinates> cities = new ArrayList<>();
 
 	public void getWeatherForCity1(){
 		Longitude longitude = new Longitude(44.3918);
 		Latitude latitude = new Latitude(33.3303);
 		GeoCoordinates location = new GeoCoordinates(longitude, latitude);
 		try {
-			ctrl.process(location);
+			cities.add(location);
+			ctrl.process(cities);
 		} catch (MyExecption e) {
 			System.out.println(e.getMessage());
 		}
@@ -31,7 +35,8 @@ public class UserInterface
 	public void getWeatherForCity2(){
 		GeoCoordinates location = new GeoCoordinates(new Longitude(45.3523), new Latitude(35.6023));
 		try {
-			ctrl.process(location);
+			cities.add(location);
+			ctrl.process(cities);
 		} catch (MyExecption e) {
 			System.out.println(e.getMessage());
 		}
@@ -40,7 +45,8 @@ public class UserInterface
 	public void getWeatherForCity3(){
 		GeoCoordinates location = new GeoCoordinates(new Longitude(44.1871),new Latitude(36.316));
 		try {
-			ctrl.process(location);
+			cities.add(location);
+			ctrl.process(cities);
 		} catch (MyExecption e) {
 			System.out.println(e.getMessage());
 		}
@@ -54,8 +60,8 @@ public class UserInterface
 		Double latitude = scanner.nextDouble();
 		GeoCoordinates location = new GeoCoordinates(new Longitude(longitude),new Latitude(latitude));
 		try {
-			ctrl.process(location);
-
+			cities.add(location);
+			ctrl.process(cities);
 		} catch (MyExecption e) {
 			System.out.println(e.getMessage());
 		}
@@ -65,16 +71,18 @@ public class UserInterface
 		Scanner scanner = new Scanner(System.in).useLocale(Locale.US);
 		System.out.print("Choose number of cities: ");
 		int numberOfCities = scanner.nextInt();
-		for(int i = 0; i < numberOfCities; i++){
-
+		Double longitude = 0.0;
+		Double latitude = 0.0;
+		for(int i = 1; i <= numberOfCities; i++){
+			System.out.print(String.format("Please enter Longitude of city %s: ",i));
+			longitude = scanner.nextDouble();
+			System.out.print(String.format("Please enter Latitude of city %s: ",i));
+			latitude = scanner.nextDouble();
+			GeoCoordinates location = new GeoCoordinates(new Longitude(longitude),new Latitude(latitude));
+			cities.add(location);
 		}
-		System.out.print("Longitude: ");
-		Double longitude = scanner.nextDouble();
-		System.out.print("Latitude: ");
-		Double latitude = scanner.nextDouble();
-		GeoCoordinates location = new GeoCoordinates(new Longitude(longitude),new Latitude(latitude));
 		try {
-			ctrl.process(location);
+			ctrl.process(cities);
 		} catch (MyExecption e) {
 			System.out.println(e.getMessage());
 		}
